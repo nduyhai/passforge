@@ -63,7 +63,7 @@ func main() {
 
 ```go
 // Example: Create a BCrypt encoder with custom cost (higher is more secure but slower)
-bcryptEncoder := passforge.NewBcryptPasswordEncoder(WithCost(12))
+bcryptEncoder := passforge.NewBcryptPasswordEncoder(passforge.WithCost(12))
 ```
 
 #### SCrypt Encoder
@@ -71,7 +71,7 @@ bcryptEncoder := passforge.NewBcryptPasswordEncoder(WithCost(12))
 ```go
 // Example: Create an SCrypt encoder with custom parameters
 // Parameters: N (CPU/memory cost), r (block size), p (parallelization), keyLen, saltLen
-scryptEncoder := passforge.NewScryptPasswordEncoder(WithScryptN(16384), WithScryptR(8), WithScryptP(1), WithScryptKeyLen(32), WithScryptSaltLen(16))
+scryptEncoder := passforge.NewScryptPasswordEncoder(passforge.WithScryptN(16384), passforge.WithScryptR(8), passforge.WithScryptP(1), passforge.WithScryptKeyLen(32), passforge.WithScryptSaltLen(16))
 
 // Or use default parameters
 scryptEncoder := passforge.NewScryptPasswordEncoder()
@@ -82,7 +82,7 @@ scryptEncoder := passforge.NewScryptPasswordEncoder()
 ```go
 // Example: Create an Argon2 encoder with custom parameters
 // Parameters: time, memory, threads, keyLen, saltLen
-argon2Encoder := passforge.NewArgon2PasswordEncoder(WithArgon2Time(1), WithArgon2Memory(64*1024), WithArgon2Threads(4), WithArgon2KeyLen(32), WithArgon2SaltLen(16))
+argon2Encoder := passforge.NewArgon2PasswordEncoder(passforge.WithArgon2Time(1), passforge.WithArgon2Memory(64*1024), passforge.WithArgon2Threads(4), passforge.WithArgon2KeyLen(32), passforge.WithArgon2SaltLen(16))
 
 // Or use default parameters
 argon2Encoder := passforge.NewArgon2PasswordEncoder()
@@ -94,7 +94,7 @@ argon2Encoder := passforge.NewArgon2PasswordEncoder()
 // Example: Create a PBKDF2 encoder with custom parameters
 // Parameters: iterations, keyLen, saltLen, hashFunc
 import "crypto/sha256"
-pbkdf2Encoder := passforge.NewPBKDF2PasswordEncoder(WithPBKDF2Iterations(1000), WithPBKDF2KeyLen(32), WithPBKDF2SaltLen(16), WithPBKDF2HashFunc(sha256.New, "sha256"))
+pbkdf2Encoder := passforge.NewPBKDF2PasswordEncoder(passforge.WithPBKDF2Iterations(1000), passforge.WithPBKDF2KeyLen(32), passforge.WithPBKDF2SaltLen(16), passforge.WithPBKDF2HashFunc(sha256.New, "sha256"))
 
 // Or use default parameters (SHA-256 hash function is used by default)
 pbkdf2Encoder := passforge.NewPBKDF2PasswordEncoder()
