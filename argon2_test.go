@@ -7,7 +7,7 @@ import (
 
 func TestArgon2PasswordEncoder_Encode(t *testing.T) {
 	// Use smaller parameters for faster tests
-	encoder := NewArgon2PasswordEncoder(1, 64*1024, 4, 32, 16)
+	encoder := NewArgon2PasswordEncoder(WithArgon2Time(1), WithArgon2Memory(64*1024), WithArgon2Threads(4), WithArgon2KeyLen(32), WithArgon2SaltLen(16))
 
 	testCases := []struct {
 		name        string
@@ -70,7 +70,7 @@ func TestArgon2PasswordEncoder_Encode(t *testing.T) {
 
 func TestArgon2PasswordEncoder_Verify(t *testing.T) {
 	// Use smaller parameters for faster tests
-	encoder := NewArgon2PasswordEncoder(1, 64*1024, 4, 32, 16)
+	encoder := NewArgon2PasswordEncoder(WithArgon2Time(1), WithArgon2Memory(64*1024), WithArgon2Threads(4), WithArgon2KeyLen(32), WithArgon2SaltLen(16))
 
 	testCases := []struct {
 		name        string
@@ -130,7 +130,7 @@ func TestArgon2PasswordEncoder_Verify(t *testing.T) {
 }
 
 func TestArgon2PasswordEncoder_InvalidFormat(t *testing.T) {
-	encoder := NewArgon2PasswordEncoder(1, 64*1024, 4, 32, 16)
+	encoder := NewArgon2PasswordEncoder(WithArgon2Time(1), WithArgon2Memory(64*1024), WithArgon2Threads(4), WithArgon2KeyLen(32), WithArgon2SaltLen(16))
 
 	// Test with invalid format
 	_, err := encoder.Verify("password", "invalid-format")
@@ -153,7 +153,7 @@ func TestArgon2PasswordEncoder_InvalidFormat(t *testing.T) {
 
 func TestArgon2PasswordEncoder_DefaultParameters(t *testing.T) {
 	// Test that default parameters are used when zeros are provided
-	encoder := NewArgon2PasswordEncoder(0, 0, 0, 0, 0)
+	encoder := NewArgon2PasswordEncoder()
 
 	// Just verify that encoding works (which means default parameters were applied)
 	password := "testpassword"

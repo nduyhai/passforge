@@ -7,7 +7,7 @@ import (
 
 func TestScryptPasswordEncoder_Encode(t *testing.T) {
 	// Use smaller parameters for faster tests
-	encoder := NewScryptPasswordEncoder(1<<10, 8, 1, 32, 16)
+	encoder := NewScryptPasswordEncoder(WithScryptN(1<<10), WithScryptR(8), WithScryptP(1), WithScryptKeyLen(32), WithScryptSaltLen(16))
 
 	testCases := []struct {
 		name        string
@@ -70,7 +70,7 @@ func TestScryptPasswordEncoder_Encode(t *testing.T) {
 
 func TestScryptPasswordEncoder_Verify(t *testing.T) {
 	// Use smaller parameters for faster tests
-	encoder := NewScryptPasswordEncoder(1<<10, 8, 1, 32, 16)
+	encoder := NewScryptPasswordEncoder(WithScryptN(1<<10), WithScryptR(8), WithScryptP(1), WithScryptKeyLen(32), WithScryptSaltLen(16))
 
 	testCases := []struct {
 		name        string
@@ -130,7 +130,7 @@ func TestScryptPasswordEncoder_Verify(t *testing.T) {
 }
 
 func TestScryptPasswordEncoder_InvalidFormat(t *testing.T) {
-	encoder := NewScryptPasswordEncoder(1<<10, 8, 1, 32, 16)
+	encoder := NewScryptPasswordEncoder(WithScryptN(1<<10), WithScryptR(8), WithScryptP(1), WithScryptKeyLen(32), WithScryptSaltLen(16))
 
 	// Test with invalid format
 	_, err := encoder.Verify("password", "invalid-format")
@@ -153,7 +153,7 @@ func TestScryptPasswordEncoder_InvalidFormat(t *testing.T) {
 
 func TestScryptPasswordEncoder_DefaultParameters(t *testing.T) {
 	// Test that default parameters are used when zeros are provided
-	encoder := NewScryptPasswordEncoder(0, 0, 0, 0, 0)
+	encoder := NewScryptPasswordEncoder()
 
 	// Just verify that encoding works (which means default parameters were applied)
 	password := "testpassword"

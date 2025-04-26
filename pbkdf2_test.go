@@ -8,7 +8,7 @@ import (
 
 func TestPBKDF2PasswordEncoder_Encode(t *testing.T) {
 	// Use smaller parameters for faster tests
-	encoder := NewPBKDF2PasswordEncoder(1000, 32, 16, sha256.New)
+	encoder := NewPBKDF2PasswordEncoder(WithPBKDF2Iterations(1000), WithPBKDF2KeyLen(32), WithPBKDF2SaltLen(16), WithPBKDF2HashFunc(sha256.New, "sha256"))
 
 	testCases := []struct {
 		name        string
@@ -71,7 +71,7 @@ func TestPBKDF2PasswordEncoder_Encode(t *testing.T) {
 
 func TestPBKDF2PasswordEncoder_Verify(t *testing.T) {
 	// Use smaller parameters for faster tests
-	encoder := NewPBKDF2PasswordEncoder(1000, 32, 16, sha256.New)
+	encoder := NewPBKDF2PasswordEncoder(WithPBKDF2Iterations(1000), WithPBKDF2KeyLen(32), WithPBKDF2SaltLen(16), WithPBKDF2HashFunc(sha256.New, "sha256"))
 
 	testCases := []struct {
 		name        string
@@ -131,7 +131,7 @@ func TestPBKDF2PasswordEncoder_Verify(t *testing.T) {
 }
 
 func TestPBKDF2PasswordEncoder_InvalidFormat(t *testing.T) {
-	encoder := NewPBKDF2PasswordEncoder(1000, 32, 16, sha256.New)
+	encoder := NewPBKDF2PasswordEncoder(WithPBKDF2Iterations(1000), WithPBKDF2KeyLen(32), WithPBKDF2SaltLen(16), WithPBKDF2HashFunc(sha256.New, "sha256"))
 
 	// Test with invalid format
 	_, err := encoder.Verify("password", "invalid-format")
@@ -154,7 +154,7 @@ func TestPBKDF2PasswordEncoder_InvalidFormat(t *testing.T) {
 
 func TestPBKDF2PasswordEncoder_DefaultParameters(t *testing.T) {
 	// Test that default parameters are used when zeros are provided
-	encoder := NewPBKDF2PasswordEncoder(0, 0, 0, nil)
+	encoder := NewPBKDF2PasswordEncoder()
 
 	// Just verify that encoding works (which means default parameters were applied)
 	password := "testpassword"

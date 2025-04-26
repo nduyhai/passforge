@@ -5,8 +5,9 @@ import (
 	"crypto/subtle"
 	"encoding/base64"
 	"fmt"
-	"golang.org/x/crypto/argon2"
 	"strings"
+
+	"golang.org/x/crypto/argon2"
 )
 
 // Argon2PasswordEncoder is a password encoder that uses the Argon2id algorithm
@@ -18,32 +19,94 @@ type Argon2PasswordEncoder struct {
 	SaltLen uint32 // Length of the salt
 }
 
-// NewArgon2PasswordEncoder creates a new Argon2PasswordEncoder with default parameters if not specified
-func NewArgon2PasswordEncoder(time, memory uint32, threads uint8, keyLen, saltLen uint32) *Argon2PasswordEncoder {
-	// Set default values if not provided
-	if time == 0 {
-		time = 1
-	}
-	if memory == 0 {
-		memory = 64 * 1024 // 64MB
-	}
-	if threads == 0 {
-		threads = 4
-	}
-	if keyLen == 0 {
-		keyLen = 32
-	}
-	if saltLen == 0 {
-		saltLen = 16
-	}
+// Argon2Option is a function that configures an Argon2PasswordEncoder
+type Argon2Option func(*Argon2PasswordEncoder)
 
-	return &Argon2PasswordEncoder{
-		Time:    time,
-		Memory:  memory,
-		Threads: threads,
-		KeyLen:  keyLen,
-		SaltLen: saltLen,
+// WithArgon2Time sets the number of iterations
+// Recommended minimum: 1
+// Recommended maximum: 2^32-1
+// Default: 1
+// See https://github.com/P-H-C/phc-winner-argon2/blob/master/argon2-specs.md#parameters
+func WithArgon2Time(time uint32) Argon2Option {
+	return func(a *Argon2PasswordEncoder) {
+		a.Time = time
 	}
+}
+
+// WithArgon2Memory sets the memory usage in KiB
+// Recommended minimum: 8
+// Recommended maximum: 2^32-1
+// Default: 64MB
+// See https://github.com/P-H-C/phc-winner-argon2/blob/master/argon2-specs.md#parameters
+// Note: The memory usage is expressed in KiB, not MiB.
+//
+//	This is because the memory usage is expressed in bytes, not kilobytes.
+//	For example, 1024 * 1024 = 1048576 bytes = 1 MiB.
+func WithArgon2Memory(memory uint32) Argon2Option {
+	return func(a *Argon2PasswordEncoder) {
+		a.Memory = memory
+	}
+}
+
+// WithArgon2Threads sets the number of threads
+// Recommended minimum: 1
+// Recommended maximum: 255
+// Default: 4
+// See https://github.com/P-H-C/phc-winner-argon2/blob/master/argon2-specs.md#parameters
+// Note: The number of threads is expressed as a byte, not a number.
+//
+//	This is because the number of threads is expressed as a power of two.
+//	For example, 2^4 = 16 threads.
+func WithArgon2Threads(threads uint8) Argon2Option {
+	return func(a *Argon2PasswordEncoder) {
+		a.Threads = threads
+	}
+}
+
+// WithArgon2KeyLen sets the length of the derived key
+// Recommended minimum: 16
+// Recommended maximum: 2^32-1
+// Default: 32
+// See https://github.com/P-H-C/phc-winner-argon2/blob/master/argon2-specs.md#parameters
+// Note: The length of the derived key is expressed in bytes, not bits.
+//
+//	This is because the length of the derived key is expressed in bytes, not bits.
+//	For example, 1024 = 1024 bytes = 1024 bits.
+func WithArgon2KeyLen(keyLen uint32) Argon2Option {
+	return func(a *Argon2PasswordEncoder) {
+		a.KeyLen = keyLen
+	}
+}
+
+// WithArgon2SaltLen sets the length of the salt
+// Recommended minimum: 16
+// Recommended maximum: 2^32-1
+// Default: 16
+// See https://github.com/P-H-C/phc-winner-argon2/blob/master/argon2-specs.md#parameters
+// Note: The length of the salt is expressed in bytes, not bits.
+//
+//	This is because the length of the salt is expressed in bytes, not bits.
+//	For example, 1024 = 1024 bytes = 1024 bits.
+func WithArgon2SaltLen(saltLen uint32) Argon2Option {
+	return func(a *Argon2PasswordEncoder) {
+		a.SaltLen = saltLen
+	}
+}
+
+// NewArgon2PasswordEncoder creates a new Argon2PasswordEncoder with default parameters if not specified
+func NewArgon2PasswordEncoder(opts ...Argon2Option) *Argon2PasswordEncoder {
+	// Set default values if not provided
+	encoder := &Argon2PasswordEncoder{
+		Time:    1,
+		Memory:  64 * 1024, // 64MB
+		Threads: 4,
+		KeyLen:  32,
+		SaltLen: 16,
+	}
+	for _, opt := range opts {
+		opt(encoder)
+	}
+	return encoder
 }
 
 // Encode hashes the raw password using Argon2id
