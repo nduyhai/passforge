@@ -21,7 +21,7 @@ MAIN_PACKAGE=.
 
 .PHONY: all build test clean lint deps help goimports
 
-all: test build
+all: test goimports fmt build
 
 # Build the project
 build:

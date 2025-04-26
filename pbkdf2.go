@@ -21,32 +21,75 @@ type PBKDF2PasswordEncoder struct {
 	HashFuncName string           // Name of the hash function (e.g., "sha256")
 }
 
+// PBKDF2Option is a functional option used to configure a PBKDF2PasswordEncoder instance.
+type PBKDF2Option func(*PBKDF2PasswordEncoder)
+
+// WithPBKDF2Iterations sets the number of iterations
+// Recommended minimum: 10000
+// Default: 10000
+// See https://en.wikipedia.org/wiki/PBKDF2#Parameters
+func WithPBKDF2Iterations(iterations int) PBKDF2Option {
+	return func(p *PBKDF2PasswordEncoder) {
+		p.Iterations = iterations
+	}
+}
+
+// WithPBKDF2KeyLen sets the length of the derived key
+// Recommended minimum: 16
+// Recommended maximum: 256
+// Default: 32
+// See https://en.wikipedia.org/wiki/PBKDF2#Parameters
+//
+//	The length of the derived key is expressed in bytes, not bits.
+//	For example, 1024 = 1024 bytes = 1024 bits.
+func WithPBKDF2KeyLen(keyLen int) PBKDF2Option {
+	return func(p *PBKDF2PasswordEncoder) {
+		p.KeyLen = keyLen
+	}
+}
+
+// WithPBKDF2SaltLen sets the length of the salt
+// Recommended minimum: 16
+// Recommended maximum: 256
+// Default: 16
+// See https://en.wikipedia.org/wiki/PBKDF2#Parameters
+//
+//	The length of the salt is expressed in bytes, not bits.
+//	For example, 1024 = 1024 bytes = 1024 bits.
+func WithPBKDF2SaltLen(saltLen int) PBKDF2Option {
+	return func(p *PBKDF2PasswordEncoder) {
+		p.SaltLen = saltLen
+	}
+}
+
+// WithPBKDF2HashFunc sets the hash function to use
+// Recommended minimum: 10000
+// Default: sha256.New
+// See https://en.wikipedia.org/wiki/PBKDF2#Parameters
+//
+//	The hash function is used to derive the key from the password and the salt.
+//	The hash function must be deterministic, i.e., the same input should always produce the same output.
+//	The hash function must be cryptographically secure, i.e., it must be impossible to reverse the hash function.
+func WithPBKDF2HashFunc(hashFunc func() hash.Hash, hashFuncName string) PBKDF2Option {
+	return func(p *PBKDF2PasswordEncoder) {
+		p.HashFunc = hashFunc
+		p.HashFuncName = hashFuncName
+	}
+}
+
 // NewPBKDF2PasswordEncoder creates a new PBKDF2PasswordEncoder with default parameters if not specified
-func NewPBKDF2PasswordEncoder(iterations, keyLen, saltLen int, hashFunc func() hash.Hash) *PBKDF2PasswordEncoder {
-	// Set default values if not provided
-	if iterations == 0 {
-		iterations = 10000 // Recommended minimum
+func NewPBKDF2PasswordEncoder(opts ...PBKDF2Option) *PBKDF2PasswordEncoder {
+	encoder := &PBKDF2PasswordEncoder{
+		Iterations:   10000,
+		KeyLen:       32,
+		SaltLen:      16,
+		HashFunc:     sha256.New,
+		HashFuncName: "sha256",
 	}
-	if keyLen == 0 {
-		keyLen = 32 // 256 bits
+	for _, opt := range opts {
+		opt(encoder)
 	}
-	if saltLen == 0 {
-		saltLen = 16 // 128 bits
-	}
-
-	// Default to SHA-256
-	hashFuncName := "sha256"
-	if hashFunc == nil {
-		hashFunc = sha256.New
-	}
-
-	return &PBKDF2PasswordEncoder{
-		Iterations:   iterations,
-		KeyLen:       keyLen,
-		SaltLen:      saltLen,
-		HashFunc:     hashFunc,
-		HashFuncName: hashFuncName,
-	}
+	return encoder
 }
 
 // Encode hashes the raw password using PBKDF2

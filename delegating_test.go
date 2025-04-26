@@ -6,7 +6,7 @@ import (
 
 func TestDelegatingPasswordEncoder_Encode(t *testing.T) {
 	// Create encoders
-	bcryptEncoder := NewBcryptPasswordEncoder(10)
+	bcryptEncoder := NewBcryptPasswordEncoder(WithCost(10))
 	noopEncoder := NewNoOpPasswordEncoder()
 
 	// Create a map of encoders
@@ -86,7 +86,7 @@ func TestDelegatingPasswordEncoder_Encode(t *testing.T) {
 
 func TestDelegatingPasswordEncoder_Verify(t *testing.T) {
 	// Create encoders
-	bcryptEncoder := NewBcryptPasswordEncoder(10)
+	bcryptEncoder := NewBcryptPasswordEncoder(WithCost(10))
 	noopEncoder := NewNoOpPasswordEncoder()
 
 	// Create a map of encoders
@@ -168,7 +168,7 @@ func TestDelegatingPasswordEncoder_Verify(t *testing.T) {
 
 func TestDelegatingPasswordEncoder_InvalidFormat(t *testing.T) {
 	// Create encoders
-	bcryptEncoder := NewBcryptPasswordEncoder(10)
+	bcryptEncoder := NewBcryptPasswordEncoder(WithCost(10))
 
 	// Create a map of encoders
 	encoders := map[string]PasswordEncoder{
@@ -198,7 +198,7 @@ func TestDelegatingPasswordEncoder_InvalidFormat(t *testing.T) {
 
 func TestDelegatingPasswordEncoder_GetDefaultId(t *testing.T) {
 	// Create encoders
-	bcryptEncoder := NewBcryptPasswordEncoder(10)
+	bcryptEncoder := NewBcryptPasswordEncoder(WithCost(10))
 	noopEncoder := NewNoOpPasswordEncoder()
 
 	// Create a map of encoders

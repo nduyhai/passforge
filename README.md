@@ -34,7 +34,7 @@ import (
 
 func main() {
     // Create a BCrypt encoder with default cost
-    encoder := passforge.NewBcryptPasswordEncoder(0)
+    encoder := passforge.NewBcryptPasswordEncoder()
 
     // Encode a password
     encoded, err := encoder.Encode("mySecurePassword")
@@ -63,7 +63,7 @@ func main() {
 
 ```go
 // Example: Create a BCrypt encoder with custom cost (higher is more secure but slower)
-bcryptEncoder := passforge.NewBcryptPasswordEncoder(12)
+bcryptEncoder := passforge.NewBcryptPasswordEncoder(WithCost(12))
 ```
 
 #### SCrypt Encoder
@@ -71,10 +71,10 @@ bcryptEncoder := passforge.NewBcryptPasswordEncoder(12)
 ```go
 // Example: Create an SCrypt encoder with custom parameters
 // Parameters: N (CPU/memory cost), r (block size), p (parallelization), keyLen, saltLen
-scryptEncoder := passforge.NewScryptPasswordEncoder(16384, 8, 1, 32, 16)
+scryptEncoder := passforge.NewScryptPasswordEncoder(WithScryptN(16384), WithScryptR(8), WithScryptP(1), WithScryptKeyLen(32), WithScryptSaltLen(16))
 
 // Or use default parameters
-scryptEncoder := passforge.NewScryptPasswordEncoder(0, 0, 0, 0, 0)
+scryptEncoder := passforge.NewScryptPasswordEncoder()
 ```
 
 #### Argon2 Encoder
@@ -82,10 +82,10 @@ scryptEncoder := passforge.NewScryptPasswordEncoder(0, 0, 0, 0, 0)
 ```go
 // Example: Create an Argon2 encoder with custom parameters
 // Parameters: time, memory, threads, keyLen, saltLen
-argon2Encoder := passforge.NewArgon2PasswordEncoder(1, 64*1024, 4, 32, 16)
+argon2Encoder := passforge.NewArgon2PasswordEncoder(WithArgon2Time(1), WithArgon2Memory(64*1024), WithArgon2Threads(4), WithArgon2KeyLen(32), WithArgon2SaltLen(16))
 
 // Or use default parameters
-argon2Encoder := passforge.NewArgon2PasswordEncoder(0, 0, 0, 0, 0)
+argon2Encoder := passforge.NewArgon2PasswordEncoder()
 ```
 
 #### PBKDF2 Encoder
@@ -94,10 +94,10 @@ argon2Encoder := passforge.NewArgon2PasswordEncoder(0, 0, 0, 0, 0)
 // Example: Create a PBKDF2 encoder with custom parameters
 // Parameters: iterations, keyLen, saltLen, hashFunc
 import "crypto/sha256"
-pbkdf2Encoder := passforge.NewPBKDF2PasswordEncoder(10000, 32, 16, sha256.New)
+pbkdf2Encoder := passforge.NewPBKDF2PasswordEncoder(WithPBKDF2Iterations(1000), WithPBKDF2KeyLen(32), WithPBKDF2SaltLen(16), WithPBKDF2HashFunc(sha256.New, "sha256"))
 
 // Or use default parameters (SHA-256 hash function is used by default)
-pbkdf2Encoder := passforge.NewPBKDF2PasswordEncoder(0, 0, 0, nil)
+pbkdf2Encoder := passforge.NewPBKDF2PasswordEncoder()
 ```
 
 #### NoOp Encoder (for testing only)
@@ -115,9 +115,9 @@ The delegating encoder allows you to use multiple encoders and automatically det
 // Example: Using the delegating password encoder
 
 // First, create individual encoders
-bcryptEncoder := passforge.NewBcryptPasswordEncoder(0)
-argon2Encoder := passforge.NewArgon2PasswordEncoder(0, 0, 0, 0, 0)
-pbkdf2Encoder := passforge.NewPBKDF2PasswordEncoder(0, 0, 0, nil)
+bcryptEncoder := passforge.NewBcryptPasswordEncoder()
+argon2Encoder := passforge.NewArgon2PasswordEncoder()
+pbkdf2Encoder := passforge.NewPBKDF2PasswordEncoder()
 
 // Create a map of encoders with their IDs
 encoders := map[string]passforge.PasswordEncoder{
@@ -137,8 +137,8 @@ encoded, _ := delegatingEncoder.Encode("myPassword")
 match, _ := delegatingEncoder.Verify("myPassword", encoded)
 
 // You can also verify passwords encoded with any of the configured encoders
-argon2Password := "{argon2}time=1,memory=65536,threads=4,keyLen=32$..."
-pbkdf2Password := "{pbkdf2}iterations=10000,keyLen=32,hashFunc=sha256$..."
+argon2Password := "{argon2}time=1,memory=65536,threads=4,keyLen=32$KwuPJjEdIoq1nSZWGsrO6w==$5OqqfWw4e/s2UJpnvFOerxMynrBV9OGDRrGsu60RS+I="
+pbkdf2Password := "{pbkdf2}iterations=10000,keyLen=32,hashFunc=sha256$+uTgq1Ll15T2MloP8UJdyQ==$G+nDsgsyWuVoQrAy8DNJXXKVTWGr9P1gmM/YNxQxyEE="
 match, _ = delegatingEncoder.Verify("myPassword", argon2Password)
 match, _ = delegatingEncoder.Verify("myPassword", pbkdf2Password)
 ```

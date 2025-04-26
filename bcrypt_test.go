@@ -5,7 +5,7 @@ import (
 )
 
 func TestBcryptPasswordEncoder_Encode(t *testing.T) {
-	encoder := NewBcryptPasswordEncoder(10) // Use a lower cost for faster tests
+	encoder := NewBcryptPasswordEncoder(WithCost(10)) // Use a lower cost for faster tests
 
 	testCases := []struct {
 		name        string
@@ -55,7 +55,7 @@ func TestBcryptPasswordEncoder_Encode(t *testing.T) {
 }
 
 func TestBcryptPasswordEncoder_Verify(t *testing.T) {
-	encoder := NewBcryptPasswordEncoder(10) // Use a lower cost for faster tests
+	encoder := NewBcryptPasswordEncoder(WithCost(10)) // Use a lower cost for faster tests
 
 	// Test verification with pre-encoded passwords
 	testCases := []struct {
@@ -128,7 +128,7 @@ func TestBcryptPasswordEncoder_Verify(t *testing.T) {
 
 func TestBcryptPasswordEncoder_DefaultCost(t *testing.T) {
 	// Test that the default cost is used when 0 is provided
-	encoder := NewBcryptPasswordEncoder(0)
+	encoder := NewBcryptPasswordEncoder()
 
 	// Just verify that encoding works (which means the default cost was applied)
 	password := "testpassword"
