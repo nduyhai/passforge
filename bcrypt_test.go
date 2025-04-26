@@ -153,3 +153,14 @@ func TestBcryptPasswordEncoder_DefaultCost(t *testing.T) {
 		t.Errorf("Verify() returned false for matching password")
 	}
 }
+
+func TestBcryptPasswordEncoder_Name(t *testing.T) {
+	encoder := NewBcryptPasswordEncoder()
+
+	expected := "bcrypt"
+	actual := encoder.Name()
+
+	if actual != expected {
+		t.Errorf("Name() = %v, want %v", actual, expected)
+	}
+}

@@ -10,14 +10,13 @@ func TestDelegatingPasswordEncoder_Encode(t *testing.T) {
 	noopEncoder := NewNoOpPasswordEncoder()
 
 	// Create a map of encoders
-	encoders := map[string]PasswordEncoder{
-		"bcrypt": bcryptEncoder,
-		"noop":   noopEncoder,
+	encoders := []PasswordEncoder{
+		bcryptEncoder, noopEncoder,
 	}
 
 	// Test with bcrypt as default
 	t.Run("with bcrypt as default", func(t *testing.T) {
-		delegatingEncoder := NewDelegatingPasswordEncoder("bcrypt", encoders)
+		delegatingEncoder, _ := NewDelegatingPasswordEncoder("bcrypt", encoders...)
 
 		rawPassword := "password123"
 		encoded, err := delegatingEncoder.Encode(rawPassword)
@@ -51,7 +50,7 @@ func TestDelegatingPasswordEncoder_Encode(t *testing.T) {
 
 	// Test with noop as default
 	t.Run("with noop as default", func(t *testing.T) {
-		delegatingEncoder := NewDelegatingPasswordEncoder("noop", encoders)
+		delegatingEncoder, _ := NewDelegatingPasswordEncoder("noop", encoders...)
 
 		rawPassword := "password123"
 		encoded, err := delegatingEncoder.Encode(rawPassword)
@@ -90,12 +89,11 @@ func TestDelegatingPasswordEncoder_Verify(t *testing.T) {
 	noopEncoder := NewNoOpPasswordEncoder()
 
 	// Create a map of encoders
-	encoders := map[string]PasswordEncoder{
-		"bcrypt": bcryptEncoder,
-		"noop":   noopEncoder,
+	encoders := []PasswordEncoder{
+		bcryptEncoder, noopEncoder,
 	}
 
-	delegatingEncoder := NewDelegatingPasswordEncoder("bcrypt", encoders)
+	delegatingEncoder, _ := NewDelegatingPasswordEncoder("bcrypt", encoders...)
 
 	// Test verification with different encoder prefixes
 	testCases := []struct {
@@ -139,8 +137,16 @@ func TestDelegatingPasswordEncoder_Verify(t *testing.T) {
 				encodedPassword = "{unknown}password123"
 			} else {
 				// Get the encoder
-				encoder := encoders[tc.encoderID]
-
+				var encoder PasswordEncoder
+				for _, e := range encoders {
+					if e.Name() == tc.encoderID {
+						encoder = e
+						break
+					}
+				}
+				if encoder == nil {
+					t.Fatalf("Failed to find encoder with ID %v", tc.encoderID)
+				}
 				// Encode the password
 				rawEncoded, errEncoder := encoder.Encode(tc.rawPassword)
 				if errEncoder != nil {
@@ -171,11 +177,11 @@ func TestDelegatingPasswordEncoder_InvalidFormat(t *testing.T) {
 	bcryptEncoder := NewBcryptPasswordEncoder(WithCost(10))
 
 	// Create a map of encoders
-	encoders := map[string]PasswordEncoder{
-		"bcrypt": bcryptEncoder,
+	encoders := []PasswordEncoder{
+		bcryptEncoder,
 	}
 
-	delegatingEncoder := NewDelegatingPasswordEncoder("bcrypt", encoders)
+	delegatingEncoder, _ := NewDelegatingPasswordEncoder("bcrypt", encoders...)
 
 	// Test with invalid format (no prefix)
 	_, err := delegatingEncoder.Verify("password", "invalid-format")
@@ -202,13 +208,13 @@ func TestDelegatingPasswordEncoder_GetDefaultId(t *testing.T) {
 	noopEncoder := NewNoOpPasswordEncoder()
 
 	// Create a map of encoders
-	encoders := map[string]PasswordEncoder{
-		"bcrypt": bcryptEncoder,
-		"noop":   noopEncoder,
+	encoders := []PasswordEncoder{
+		bcryptEncoder,
+		noopEncoder,
 	}
 
 	// Test with bcrypt as default
-	delegatingEncoder := NewDelegatingPasswordEncoder("bcrypt", encoders)
+	delegatingEncoder, _ := NewDelegatingPasswordEncoder("bcrypt", encoders...)
 
 	// Use the Encode method which internally calls getDefaultID
 	encoded, err := delegatingEncoder.Encode("password")
@@ -288,5 +294,25 @@ func TestExtractIdAndHash(t *testing.T) {
 				t.Errorf("extractIDAndHash() hash = %v, want %v", hash, tc.wantHash)
 			}
 		})
+	}
+}
+
+func TestDelegatingPasswordEncoder_Name(t *testing.T) {
+
+	encoders := []PasswordEncoder{
+		NewBcryptPasswordEncoder(),
+		NewArgon2PasswordEncoder(),
+		NewPBKDF2PasswordEncoder(),
+		NewNoOpPasswordEncoder(),
+		NewScryptPasswordEncoder(),
+	}
+
+	names := make(map[string]PasswordEncoder, len(encoders))
+	for _, v := range encoders {
+		names[v.Name()] = v
+	}
+
+	if len(names) != len(encoders) {
+		t.Errorf("Expected %v encoders, got %v", len(encoders), len(names))
 	}
 }

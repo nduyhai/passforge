@@ -178,3 +178,14 @@ func TestScryptPasswordEncoder_DefaultParameters(t *testing.T) {
 		t.Errorf("Verify() returned false for matching password")
 	}
 }
+
+func TestScryptPasswordEncoder_Name(t *testing.T) {
+	encoder := NewScryptPasswordEncoder()
+
+	expected := "scrypt"
+	actual := encoder.Name()
+
+	if actual != expected {
+		t.Errorf("Name() = %v, want %v", actual, expected)
+	}
+}

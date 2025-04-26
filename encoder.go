@@ -7,4 +7,7 @@ type PasswordEncoder interface {
 
 	// Verify returns true if the raw password matches the encoded password
 	Verify(rawPassword, encodedPassword string) (bool, error)
+
+	// Name returns the name of the encoder.
+	Name() string
 }
