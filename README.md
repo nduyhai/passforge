@@ -187,7 +187,6 @@ make help
 This project uses GitHub Actions for continuous integration. The workflow includes:
 
 - Running tests on multiple Go versions
-- Running linter checks using golangci-lint
 
 The configuration files are:
 - `.github/workflows/ci.yml`: GitHub Actions workflow configuration
