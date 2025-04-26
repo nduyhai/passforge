@@ -64,3 +64,8 @@ func (b *BcryptPasswordEncoder) Verify(rawPassword, encodedPassword string) (boo
 	}
 	return true, nil
 }
+
+// Name returns the name of the encoder.
+func (b *BcryptPasswordEncoder) Name() string {
+	return "bcrypt"
+}

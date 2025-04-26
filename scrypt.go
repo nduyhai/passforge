@@ -166,3 +166,8 @@ func (s *ScryptPasswordEncoder) Verify(rawPassword, encodedPassword string) (boo
 	// Compare hashes using constant-time comparison to prevent timing attacks
 	return subtle.ConstantTimeCompare(storedHash, computedHash) == 1, nil
 }
+
+// Name returns the name of the encoder.
+func (s *ScryptPasswordEncoder) Name() string {
+	return "scrypt"
+}

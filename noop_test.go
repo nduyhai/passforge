@@ -97,3 +97,14 @@ func TestNoOpPasswordEncoder_Verify(t *testing.T) {
 		})
 	}
 }
+
+func TestNoOpPasswordEncoder_Name(t *testing.T) {
+	encoder := NewNoOpPasswordEncoder()
+
+	expected := "noop"
+	actual := encoder.Name()
+
+	if actual != expected {
+		t.Errorf("Name() = %v, want %v", actual, expected)
+	}
+}

@@ -156,3 +156,8 @@ func (p *PBKDF2PasswordEncoder) Verify(rawPassword, encodedPassword string) (boo
 	// Compare hashes using constant-time comparison to prevent timing attacks
 	return subtle.ConstantTimeCompare(storedHash, computedHash) == 1, nil
 }
+
+// Name returns the name of the encoder.
+func (p *PBKDF2PasswordEncoder) Name() string {
+	return "pbkdf2"
+}

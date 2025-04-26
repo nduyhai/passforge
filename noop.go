@@ -19,3 +19,8 @@ func (n *NoOpPasswordEncoder) Encode(rawPassword string) (string, error) {
 func (n *NoOpPasswordEncoder) Verify(rawPassword, encodedPassword string) (bool, error) {
 	return rawPassword == encodedPassword, nil
 }
+
+// Name returns the name of the encoder.
+func (n *NoOpPasswordEncoder) Name() string {
+	return "noop"
+}
