@@ -15,3 +15,4 @@ jobs:
       - uses: googleapis/release-please-action@v4
         with:
           release-type: go
+          token: ${{ secrets.GH_PASSFORGE_TOKEN }}
