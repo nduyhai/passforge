@@ -161,7 +161,7 @@ match, _ = delegatingEncoder.Verify("myPassword", pbkdf2Password)
 
 ### Prerequisites
 
-- Go 1.24 or higher
+- Go 1.25 or higher
 
 ### Available Make Commands
 
