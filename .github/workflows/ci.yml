@@ -2,25 +2,47 @@ name: CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
-    name: Test
+    name: Test (Go ${{ matrix.go-version }})
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
     strategy:
+      fail-fast: false
       matrix:
-        go-version: [1.25.x]
+        go-version: [ "1.25.x" ]
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v6
 
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go-version }}
+          cache: true
+
+      - name: Extra Go cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ matrix.go-version }}-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-${{ matrix.go-version }}-
 
       - name: Install dependencies
         run: make deps
@@ -29,4 +51,5 @@ jobs:
         run: make test
 
       - name: Run tests with coverage
+        if: github.event_name == 'pull_request'
         run: make test-coverage
