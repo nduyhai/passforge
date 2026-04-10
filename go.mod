@@ -2,6 +2,6 @@ module github.com/nduyhai/passforge
 
 go 1.25.0
 
-require golang.org/x/crypto v0.48.0
+require golang.org/x/crypto v0.50.0
 
-require golang.org/x/sys v0.41.0 // indirect
+require golang.org/x/sys v0.43.0 // indirect
