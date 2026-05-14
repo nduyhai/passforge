@@ -1,5 +1,9 @@
 # PassForge
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/nduyhai/passforge)
+
+
+
 PassForge is a Go library for secure password encoding and verification. It provides a collection of password encoders implementing various hashing algorithms with a consistent interface.
 
 ## Features
